@@ -79,7 +79,7 @@ public class RKPieChartView: UIView {
     private var titlesView: UIStackView?
     private var totalRatio: CGFloat = 0
     private let itemHeight: CGFloat = 10.0
-    private var centerTitle: String?
+    var centerTitle: String?
     private var centerLabel: UILabel?
     
     private var currentTime = CACurrentMediaTime()
@@ -95,10 +95,10 @@ public class RKPieChartView: UIView {
         let arcWidth: CGFloat = self.arcWidth
         
         let circlePath = UIBezierPath(arcCenter: center,
-                                radius: radius/2 - arcWidth/2,
-                                startAngle: 0,
-                                endAngle: 2 * π,
-                                clockwise: true)
+                                      radius: radius/2 - arcWidth/2,
+                                      startAngle: 0,
+                                      endAngle: 2 * π,
+                                      clockwise: true)
         
         // draw circle path
         circlePath.lineWidth = arcWidth
@@ -132,8 +132,20 @@ public class RKPieChartView: UIView {
         }
     }
     
+    public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        
+        let point = touches.first!.location(in: self) // Where you pressed
+        
+        if let layer = self.layer.hitTest(point) as? CAShapeLayer { // If you hit a layer and if its a Shapelayer
+            print()
+            //            if CGPathContainsPoint(layer.path, nil, point, false) { // Optional, if you are inside its content path
+            //                println("Hit shapeLayer") // Do something
+            //            }
+        }
+    }
+    
     private func drawCircle(){
-        items.forEach { (item) in
+        items.enumerated().forEach { (index, item) in
             // Center of the view
             let center = calculateCenter()
             
@@ -161,18 +173,17 @@ public class RKPieChartView: UIView {
                 shapeLayer.strokeColor = item.color.cgColor
                 shapeLayer.lineWidth = arcWidth
                 shapeLayer.fillColor = UIColor.clear.cgColor
+                shapeLayer.lineCap = kCALineCapRound
+                shapeLayer.lineJoin = kCALineJoinRound
                 
-                if let lineCap = (LineCapStyle(rawValue: Int(style.rawValue))?.description) {
-                    shapeLayer.lineCap = lineCap
-                }
                 
                 layer.addSublayer(shapeLayer)
                 
-                let animation = CABasicAnimation(keyPath: "strokeEnd")
-                animation.duration = 0.5
-                animation.fromValue = 0.0
-                animation.toValue = 1.0
-                shapeLayer.add(animation, forKey: "strokeEnd")
+                //                let animation = CABasicAnimation(keyPath: "strokeEnd")
+                //                animation.duration = 0.5
+                //                animation.fromValue = 0.0
+                //                animation.toValue = 1.0
+                //                shapeLayer.add(animation, forKey: "strokeEnd")
             }
             
             if (isIntensityActivated) {
@@ -211,17 +222,42 @@ public class RKPieChartView: UIView {
     
     
     /// calculate each item's angle to present pie chart
+    //    private func calculateAngles() {
+    //        totalRatio = items.map({ $0.ratio }).reduce(0, { $0 + $1 })
+    //        for (index, item) in items.enumerated() {
+    //            let degreeOffset = 6
+    //
+    //            item.startAngle = index == 0 ? 3 * π / 2 : items[index - 1].endAngle!// + CGFloat(2).degreesToRadians
+    //            item.startAngle = item.startAngle! + CGFloat(index == 0 ? 0 : degreeOffset * 2).degreesToRadians
+    //            if items.count == 1 {
+    //                totalRatio = item.ratio
+    //            }
+    //            item.endAngle = item.startAngle! + (CGFloat( (360 - (0 * items.count)) ) * item.ratio / totalRatio).degreesToRadians
+    //            item.endAngle = item.endAngle! - CGFloat(degreeOffset * 2).degreesToRadians
+    //            //            if item.endAngle! > 2 * π {
+    //            //                item.endAngle = item.endAngle! - 2 * π
+    //            //            }
+    //
+    //            item.endAngle = max(item.startAngle!, item.endAngle!)
+    //        }
+    //    }
+    
+    
     private func calculateAngles() {
         totalRatio = items.map({ $0.ratio }).reduce(0, { $0 + $1 })
+        
         for (index, item) in items.enumerated() {
-            item.startAngle = index == 0 ? 3 * π / 2 : items[index - 1].endAngle
-            if items.count == 1 {
-                totalRatio = 100
-            }
-            item.endAngle = item.startAngle! + (360 * item.ratio / totalRatio).degreesToRadians
-            if item.endAngle! > 2 * π {
-                item.endAngle = item.endAngle! - 2 * π
-            }
+            let degreeOffset = 10
+            
+            item.startAngle = index == 0 ? 3 * π / 2 : items[index - 1].endAngle!
+            item.startAngle = item.startAngle! + CGFloat(index == 0 ? 2 : degreeOffset).degreesToRadians
+            
+            item.endAngle = item.startAngle! + (CGFloat( (360 - (degreeOffset * items.count)) ) * item.ratio / totalRatio).degreesToRadians
+            //            if item.endAngle! > 2 * π {
+            //                item.endAngle = item.endAngle! - 2 * π
+            //            }
+            
+            item.endAngle = max(item.startAngle!, item.endAngle!)
         }
     }
     
@@ -296,5 +332,5 @@ private extension UIColor {
         
         return UIColor()
     }
-
+    
 }
