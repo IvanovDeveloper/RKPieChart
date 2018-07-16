@@ -2,7 +2,7 @@
 //  RKPieChart.swift
 //  Pods
 //
-//  Created by ridvan kuccuk on 31/08/2017.
+//  Created by Ivanov Developer on 31/08/2017.
 //
 //
 
