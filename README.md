@@ -1,4 +1,4 @@
-Forked from ridvank/RKPieChart and reworked
+Forked from https://github.com/ridvank/RKPieChart and reworked
 
 ## Author
 
