@@ -8,11 +8,13 @@
 
 public class RKPieChartItem {
     
+    var identifier: String = UUID().uuidString
     var ratio: CGFloat
     var color: UIColor
     var startAngle: CGFloat?
     var endAngle: CGFloat?
     var title: String?
+    
     
     public init(ratio: uint, color: UIColor, title: String? = nil) {
         self.ratio = CGFloat(ratio)

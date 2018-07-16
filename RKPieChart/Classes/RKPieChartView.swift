@@ -76,6 +76,12 @@ public class RKPieChartView: UIView {
     }
     
     private var items: [RKPieChartItem] = [RKPieChartItem]()
+    private var shapeLayers: [CAShapeLayer] = []
+    private var selectedItem: RKPieChartItem? {
+        didSet {
+//            configureColors()
+        }
+    }
     private var titlesView: UIStackView?
     private var totalRatio: CGFloat = 0
     private let itemHeight: CGFloat = 10.0
@@ -133,18 +139,60 @@ public class RKPieChartView: UIView {
     }
     
     public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        let touch = touches.first
         
-        let point = touches.first!.location(in: self) // Where you pressed
+        guard let point = touch?.location(in: self) else { return }
+        guard let sublayers = self.layer.sublayers else { return }
         
-        if let layer = self.layer.hitTest(point) as? CAShapeLayer { // If you hit a layer and if its a Shapelayer
-            print()
-            //            if CGPathContainsPoint(layer.path, nil, point, false) { // Optional, if you are inside its content path
-            //                println("Hit shapeLayer") // Do something
-            //            }
+        selectedItem = nil
+        
+        for layer in sublayers {
+            guard let shapeLayer = layer as? CAShapeLayer else {continue}
+            guard let path = shapeLayer.path, path.contains(point) else {continue}
+            guard let index = shapeLayers.index(of: shapeLayer) else {return}
+            let item = items[index]
+            
+            if let selectedItem = self.selectedItem {
+                if selectedItem.identifier == item.identifier {
+                    self.selectedItem = nil
+                } else {
+                    self.selectedItem = item
+                }
+            } else {
+                self.selectedItem = item
+            }
+        }
+        
+        
+        configureColors()
+
+    }
+    
+    func configureColors() {
+        if let selectedItem = selectedItem {
+            items.enumerated().forEach { [unowned self] (index, item) in
+                let shapeLayer = self.shapeLayers[index]
+                
+                if item.identifier == selectedItem.identifier {
+                    shapeLayer.opacity = 1
+                } else {
+                    shapeLayer.opacity = 0.2
+                }
+            }
+        } else {
+            items.enumerated().forEach { [unowned self] (index, item) in
+                let shapeLayer = self.shapeLayers[index]
+                shapeLayer.opacity = 1
+            }
         }
     }
     
     private func drawCircle(){
+        shapeLayers.forEach { (layer) in
+            layer.removeFromSuperlayer()
+        }
+        shapeLayers = []
+        
         items.enumerated().forEach { (index, item) in
             // Center of the view
             let center = calculateCenter()
@@ -176,9 +224,11 @@ public class RKPieChartView: UIView {
                 shapeLayer.lineCap = kCALineCapRound
                 shapeLayer.lineJoin = kCALineJoinRound
                 
+//                shapeLayer.bounds = (shapeLayer.path?.boundingBox)!
+
                 
                 layer.addSublayer(shapeLayer)
-                
+                shapeLayers.append(shapeLayer)
                 //                let animation = CABasicAnimation(keyPath: "strokeEnd")
                 //                animation.duration = 0.5
                 //                animation.fromValue = 0.0
@@ -247,7 +297,7 @@ public class RKPieChartView: UIView {
         totalRatio = items.map({ $0.ratio }).reduce(0, { $0 + $1 })
         
         for (index, item) in items.enumerated() {
-            let degreeOffset = 10
+            let degreeOffset = 16
             
             item.startAngle = index == 0 ? 3 * π / 2 : items[index - 1].endAngle!
             item.startAngle = item.startAngle! + CGFloat(index == 0 ? 2 : degreeOffset).degreesToRadians
