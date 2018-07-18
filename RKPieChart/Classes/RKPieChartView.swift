@@ -77,6 +77,7 @@ public class RKPieChartView: UIView {
     
     private var items: [RKPieChartItem] = [RKPieChartItem]()
     private var shapeLayers: [CAShapeLayer] = []
+    private var pathes: [UIBezierPath] = []
     private var selectedItem: RKPieChartItem? {
         didSet {
 //            configureColors()
@@ -142,13 +143,39 @@ public class RKPieChartView: UIView {
         let touch = touches.first
         
         guard let point = touch?.location(in: self) else { return }
+        
+//        self.selectedItem = nil
+//        pathes.enumerated().forEach { (index, path) in
+//            if path.contains(point) {
+//
+//
+//                let item = items[index]
+//
+//                if let selectedItem = self.selectedItem {
+//                    if selectedItem.identifier == item.identifier {
+//                        self.selectedItem = nil
+//                    } else {
+//                        self.selectedItem = item
+//                    }
+//                } else {
+//                    self.selectedItem = item
+//                }
+//            }
+//        }
+//
+//
+//        return
         guard let sublayers = self.layer.sublayers else { return }
         
         selectedItem = nil
         
         for layer in sublayers {
+
+            
             guard let shapeLayer = layer as? CAShapeLayer else {continue}
-            guard let path = shapeLayer.path, path.contains(point) else {continue}
+//            guard let tapped = shapeLayer.hitTest(point) else {continue}
+            guard let path = shapeLayer.path else {continue}
+            guard path.contains(point) else {continue}
             guard let index = shapeLayers.index(of: shapeLayer) else {return}
             let item = items[index]
             
@@ -172,7 +199,7 @@ public class RKPieChartView: UIView {
         if let selectedItem = selectedItem {
             items.enumerated().forEach { [unowned self] (index, item) in
                 let shapeLayer = self.shapeLayers[index]
-                
+
                 if item.identifier == selectedItem.identifier {
                     shapeLayer.opacity = 1
                 } else {
@@ -193,6 +220,7 @@ public class RKPieChartView: UIView {
         }
         shapeLayers = []
         
+        
         items.enumerated().forEach { (index, item) in
             // Center of the view
             let center = calculateCenter()
@@ -211,9 +239,12 @@ public class RKPieChartView: UIView {
             if(!isAnimationActivated) {
                 // Draw circle path
                 circlePath.lineWidth = arcWidth
-                circlePath.lineCapStyle = style
+                circlePath.lineCapStyle = .round
+                circlePath.lineJoinStyle = .round
                 item.color.setStroke()
                 circlePath.stroke()
+                
+                pathes.append(circlePath)
             }
             else {
                 let shapeLayer: CAShapeLayer = CAShapeLayer()
@@ -223,6 +254,7 @@ public class RKPieChartView: UIView {
                 shapeLayer.fillColor = UIColor.clear.cgColor
                 shapeLayer.lineCap = kCALineCapRound
                 shapeLayer.lineJoin = kCALineJoinRound
+//                shapeLayer.bounds = shapeLayer.path!.boundingBoxOfPath
                 
 //                shapeLayer.bounds = (shapeLayer.path?.boundingBox)!
 
@@ -297,12 +329,16 @@ public class RKPieChartView: UIView {
         totalRatio = items.map({ $0.ratio }).reduce(0, { $0 + $1 })
         
         for (index, item) in items.enumerated() {
-            let degreeOffset = 16
+//            let radius: CGFloat = 150.0 - arcWidth
+//            let digreesInPixel: CGFloat = radius/90
+//            let degreeOffset = digreesInPixel * 5
+            
+            let degreeOffset: CGFloat = 16
             
             item.startAngle = index == 0 ? 3 * π / 2 : items[index - 1].endAngle!
             item.startAngle = item.startAngle! + CGFloat(index == 0 ? 2 : degreeOffset).degreesToRadians
             
-            item.endAngle = item.startAngle! + (CGFloat( (360 - (degreeOffset * items.count)) ) * item.ratio / totalRatio).degreesToRadians
+            item.endAngle = item.startAngle! + (CGFloat( (360 - (degreeOffset * CGFloat(items.count))) ) * item.ratio / totalRatio).degreesToRadians
             //            if item.endAngle! > 2 * π {
             //                item.endAngle = item.endAngle! - 2 * π
             //            }
@@ -352,35 +388,4 @@ public class RKPieChartView: UIView {
             return min(bounds.width - CGFloat(items.count) * 2 * itemHeight, bounds.height - CGFloat(items.count) * 2 * itemHeight)
         }
     }
-}
-
-private extension Int {
-    var degreesToRadians: Double { return Double(self) * .pi / 180 }
-}
-
-private extension FloatingPoint {
-    var degreesToRadians: Self { return self * .pi / 180 }
-    var radiansToDegrees: Self { return self * 180 / .pi }
-}
-
-private extension UIColor {
-    var dark: UIColor {
-        var r:CGFloat = 0, g:CGFloat = 0, b:CGFloat = 0, a:CGFloat = 0
-        
-        if self.getRed(&r, green: &g, blue: &b, alpha: &a){
-            return UIColor(red: max(r - 0.4, 0.0), green: max(g - 0.4, 0.0), blue: max(b - 0.4, 0.0), alpha: a)
-        }
-        
-        return UIColor()
-    }
-    var light: UIColor {
-        var r:CGFloat = 0, g:CGFloat = 0, b:CGFloat = 0, a:CGFloat = 0
-        
-        if self.getRed(&r, green: &g, blue: &b, alpha: &a){
-            return UIColor(red: min(r + 0.4, 1.0), green: min(g + 0.4, 1.0), blue: min(b + 0.4, 1.0), alpha: a)
-        }
-        
-        return UIColor()
-    }
-    
 }

@@ -1,0 +1,16 @@
+PODS:
+  - RKPieChart (0.0.1)
+
+DEPENDENCIES:
+  - RKPieChart (from `../`)
+
+EXTERNAL SOURCES:
+  RKPieChart:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  RKPieChart: 735bfef9edef15326533b3d11427e67ca997c198
+
+PODFILE CHECKSUM: 801b339a43f8ceb292dfa0d9407bbdb35a8fc36f
+
+COCOAPODS: 1.5.3
