@@ -129,7 +129,7 @@ public class VMPieChartView: UIView {
         backgroundColor = .clear
     }
     
-    func configure(items: [VMPieChartItem], centerTitle: String? = nil) {
+    public func configure(items: [VMPieChartItem], centerTitle: String? = nil) {
         self.items = items
         self.centerTitle = centerTitle
         calculateAngles()
