@@ -83,14 +83,14 @@ public class VMPieChartView: UIView {
     }
     
     private var items: [VMPieChartItem] = [VMPieChartItem]()
-    var shapes: [Shape] = []
-    var selectedShape: Shape? {
+    public var shapes: [Shape] = []
+    public var selectedShape: Shape? {
         didSet {
             didSelectedIndex?(selectedIndex)
         }
     }
-    var didSelectedIndex: ((Int?) -> Void)?
-    var selectedIndex: Int? {
+    public var didSelectedIndex: ((Int?) -> Void)?
+    public var selectedIndex: Int? {
         return selectedShape?.index
     }
     
