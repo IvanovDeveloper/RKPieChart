@@ -30,53 +30,8 @@ public struct Shape: Equatable {
 
 public class VMPieChartView: UIView {
     
-    /// background color of the pie
-    public var circleColor: UIColor = .white {
-        didSet {
-            setNeedsLayout()
-        }
-    }
-    
-    
     /// width of the each item
     public var arcWidth: CGFloat = 75 {
-        didSet {
-            setNeedsLayout()
-        }
-    }
-    
-    
-    /// add intensity to item or not
-    public var isIntensityActivated: Bool = false {
-        didSet {
-            setNeedsLayout()
-        }
-    }
-    
-    /// show the titles of the item or not
-    public var isTitleViewHidden: Bool = false {
-        didSet {
-            if !isTitleViewHidden {
-                titlesView?.removeFromSuperview()
-                updateConstraints()
-            }
-        }
-    }
-    
-    /// line cap style. ex: butt, round, square
-    public var style: CGLineCap = .butt {
-        didSet {
-            if (items.count != 1 && style != .butt) {
-                assertionFailure("Number of items should be equal to 1 to update style")
-                style = .butt
-            }
-            setNeedsLayout()
-        }
-    }
-    
-    
-    /// animate each item or not
-    public var isAnimationActivated: Bool = false {
         didSet {
             setNeedsLayout()
         }
@@ -95,13 +50,8 @@ public class VMPieChartView: UIView {
     }
     
     
-    private var titlesView: UIStackView?
     private var totalRatio: CGFloat = 0
     private let itemHeight: CGFloat = 10.0
-    var centerTitle: String?
-    private var centerLabel: UILabel?
-    
-    private var currentTime = CACurrentMediaTime()
     
     // MARK: - Life Cycle
     
@@ -124,20 +74,19 @@ public class VMPieChartView: UIView {
     convenience public init(items: [VMPieChartItem], centerTitle: String? = nil) {
         self.init()
         self.items = items
-        self.centerTitle = centerTitle
         calculateAngles()
         backgroundColor = .clear
     }
     
     public func configure(items: [VMPieChartItem], centerTitle: String? = nil) {
         self.items = items
-        self.centerTitle = centerTitle
         calculateAngles()
         setNeedsDisplay()
     }
     
     public override func layoutSubviews() {
         super.layoutSubviews()
+        setNeedsDisplay()
     }
     
     public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -217,23 +166,13 @@ public class VMPieChartView: UIView {
     ///
     /// - Returns: point of the center
     private func calculateCenter() -> CGPoint {
-        if isTitleViewHidden {
-            return CGPoint(x:bounds.width/2, y: bounds.height/2)
-        }
-        else {
-            return CGPoint(x:bounds.width/2, y: bounds.height/2 - CGFloat(items.count) * itemHeight)
-        }
+        return CGPoint(x:bounds.width/2, y: bounds.height/2)
     }
     
     /// calculate radius of the graph
     ///
     /// - Returns: value of the radius
     private func calculateRadius() -> CGFloat {
-        if isTitleViewHidden {
-            return min(bounds.width, bounds.height)
-        }
-        else {
-            return min(bounds.width - CGFloat(items.count) * 2 * itemHeight, bounds.height - CGFloat(items.count) * 2 * itemHeight)
-        }
+        return min(bounds.width, bounds.height)
     }
 }
