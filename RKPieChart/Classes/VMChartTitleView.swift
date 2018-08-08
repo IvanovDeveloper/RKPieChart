@@ -10,14 +10,14 @@ import UIKit
 
 protocol Configurable {
     func configureSubviews()
-    var item: RKPieChartItem { get set }
+    var item: VMPieChartItem { get set }
 }
 
-class RKChartTitleView: UIView, Configurable {
+class VMChartTitleView: UIView, Configurable {
     
-    var item: RKPieChartItem
+    var item: VMPieChartItem
     
-    init(item: RKPieChartItem){
+    init(item: VMPieChartItem) {
         self.item = item
         super.init(frame: .zero)
         configureSubviews()

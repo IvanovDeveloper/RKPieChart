@@ -17,6 +17,15 @@ internal extension FloatingPoint {
 }
 
 internal extension UIColor {
+    var alpha20: UIColor {
+        var r:CGFloat = 0, g:CGFloat = 0, b:CGFloat = 0, a:CGFloat = 0
+        
+        if self.getRed(&r, green: &g, blue: &b, alpha: &a){
+            return UIColor(red: r, green: g, blue: b, alpha: 0.2)
+        }
+        
+        return UIColor()
+    }
     var dark: UIColor {
         var r:CGFloat = 0, g:CGFloat = 0, b:CGFloat = 0, a:CGFloat = 0
         

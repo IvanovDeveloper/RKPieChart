@@ -14,14 +14,14 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let firstItem: RKPieChartItem = RKPieChartItem(ratio: 1050, color: UIColor.orange, title: "1️⃣th Item ")
-        let secondItem: RKPieChartItem = RKPieChartItem(ratio: 30, color: UIColor.gray, title: "2️⃣nd Item")
-        let thirdItem: RKPieChartItem = RKPieChartItem(ratio: 20, color: UIColor.yellow, title: "3️⃣th Item")
-        let item4: RKPieChartItem = RKPieChartItem(ratio: 20, color: UIColor.yellow, title: "3️⃣th Item")
-        let item5: RKPieChartItem = RKPieChartItem(ratio: 20, color: UIColor.yellow, title: "3️⃣th Item")
-        let item6: RKPieChartItem = RKPieChartItem(ratio: 20, color: UIColor.yellow, title: "3️⃣th Item")
+        let firstItem: VMPieChartItem = VMPieChartItem(ratio: 1050, color: UIColor.orange, title: "1️⃣th Item ")
+        let secondItem: VMPieChartItem = VMPieChartItem(ratio: 30, color: UIColor.gray, title: "2️⃣nd Item")
+        let thirdItem: VMPieChartItem = VMPieChartItem(ratio: 20, color: UIColor.yellow, title: "3️⃣th Item")
+        let item4: VMPieChartItem = VMPieChartItem(ratio: 20, color: UIColor.yellow, title: "3️⃣th Item")
+        let item5: VMPieChartItem = VMPieChartItem(ratio: 20, color: UIColor.yellow, title: "3️⃣th Item")
+        let item6: VMPieChartItem = VMPieChartItem(ratio: 20, color: UIColor.yellow, title: "3️⃣th Item")
         
-        let chartView = RKPieChartView(items: [firstItem, secondItem, thirdItem, item4, item5, item6], centerTitle: "")
+        let chartView = VMPieChartView(items: [firstItem, secondItem, thirdItem, item4, item5, item6], centerTitle: "")
         chartView.circleColor = .clear
         chartView.translatesAutoresizingMaskIntoConstraints = false
         chartView.arcWidth = 16
@@ -31,8 +31,8 @@ class ViewController: UIViewController {
         chartView.isAnimationActivated = true
         self.view.addSubview(chartView)
         
-        chartView.widthAnchor.constraint(equalToConstant: 150).isActive = true
-        chartView.heightAnchor.constraint(equalToConstant: 150).isActive = true
+        chartView.widthAnchor.constraint(equalToConstant: 300).isActive = true
+        chartView.heightAnchor.constraint(equalToConstant: 300).isActive = true
         chartView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
         chartView.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
         

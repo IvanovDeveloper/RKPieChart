@@ -6,7 +6,7 @@
 //
 //
 
-public class RKPieChartItem {
+public class VMPieChartItem {
     
     var identifier: String = UUID().uuidString
     var ratio: CGFloat
