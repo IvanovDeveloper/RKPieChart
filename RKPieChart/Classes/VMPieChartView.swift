@@ -152,7 +152,7 @@ public class VMPieChartView: UIView {
         totalRatio = items.map({ $0.ratio }).reduce(0, { $0 + $1 })
         
         for (index, item) in items.enumerated() {
-            let degreeOffset: CGFloat = 10
+            let degreeOffset: CGFloat = 15
             
             item.startAngle = index == 0 ? 3 * π / 2 : items[index - 1].endAngle!
             item.startAngle = item.startAngle! + CGFloat(index == 0 ? 2 : degreeOffset).degreesToRadians
