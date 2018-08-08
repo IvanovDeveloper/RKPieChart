@@ -21,7 +21,7 @@ private enum LineCapStyle: Int {
     }
 }
 
-struct Shape: Equatable {
+public struct Shape: Equatable {
     let path: UIBezierPath
     let color: UIColor
     let tapPath: UIBezierPath
