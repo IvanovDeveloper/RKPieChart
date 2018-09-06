@@ -147,7 +147,7 @@ public class VMPieChartView: UIView {
                 let xPosition = center.x + cos(labelAngle) * (radius - arcWidth / 2) - textWidth / 2
                 let yPosition = center.y + sin(labelAngle) * (radius - arcWidth / 2) - textWidth / 2
                 let boundingRect = CGRect(x: xPosition, y: yPosition, width: textWidth, height: textHeight)
-                let textLayer = getTextLayer(text: "\(Int(item.ratio))", bounding: boundingRect)
+                let textLayer = getTextLayer(text: item.title, bounding: boundingRect)
                 layer.addSublayer(textLayer)
             }
 
