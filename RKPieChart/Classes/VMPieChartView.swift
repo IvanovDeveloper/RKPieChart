@@ -8,7 +8,7 @@
 
 import CoreGraphics
 
-let π: CGFloat = CGFloat(Double.pi)
+let π: CGFloat = .pi
 
 private enum LineCapStyle: Int {
     
@@ -112,14 +112,13 @@ public class VMPieChartView: UIView {
     
     private func drawCircle(){
         shapes.removeAll()
-        
+        clearText()
+        let center = calculateCenter(of: bounds)
+        let radius = calculateRadius(fitIn: bounds)
+        let arcWidth = self.arcWidth
         items.enumerated().forEach { (index, item) in
-            let center = calculateCenter()
-            let radius: CGFloat = calculateRadius()
-            let arcWidth: CGFloat = self.arcWidth
-            
             let circlePath = UIBezierPath(arcCenter: center,
-                                          radius: radius/2 - arcWidth/2,
+                                          radius: radius - arcWidth/2,
                                           startAngle: item.startAngle!,
                                           endAngle: item.endAngle!,
                                           clockwise: true)
@@ -140,6 +139,18 @@ public class VMPieChartView: UIView {
             }
             circlePath.stroke()
             
+            // MARK: - kludge for inscriptions
+            if abs((item.endAngle! - item.startAngle!).truncatingRemainder(dividingBy: (2 * .pi)) ) > (.pi / 45) {
+                let labelAngle = item.endAngle! - (.pi / 108)
+                let textHeight: CGFloat = 9
+                let textWidth: CGFloat = 12
+                let xPosition = center.x + cos(labelAngle) * (radius - arcWidth / 2) - textWidth / 2
+                let yPosition = center.y + sin(labelAngle) * (radius - arcWidth / 2) - textWidth / 2
+                let boundingRect = CGRect(x: xPosition, y: yPosition, width: textWidth, height: textHeight)
+                let textLayer = getTextLayer(text: "\(Int(item.ratio))", bounding: boundingRect)
+                layer.addSublayer(textLayer)
+            }
+
             let tapPath = circlePath.cgPath.copy(strokingWithWidth: circlePath.lineWidth, lineCap: circlePath.lineCapStyle, lineJoin: circlePath.lineJoinStyle, miterLimit: circlePath.miterLimit)
             
             let shape = Shape.init(path: circlePath, color: item.color, tapPath: UIBezierPath.init(cgPath: tapPath), index: index)
@@ -148,6 +159,27 @@ public class VMPieChartView: UIView {
         }
     }
     
+    private func clearText() {
+        layer.sublayers?.forEach({ (sublayer) in
+            if sublayer is CATextLayer {
+                sublayer.removeFromSuperlayer()
+            }
+        })
+    }
+
+    private func getTextLayer(text: String, bounding: CGRect) -> CATextLayer {
+        let textLayer = CATextLayer()
+        textLayer.frame = bounding
+        textLayer.foregroundColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1).cgColor
+        textLayer.backgroundColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 0).cgColor
+        textLayer.contentsScale = UIScreen.main.scale
+        textLayer.font = CTFontCreateWithName("Helvetica" as CFString, 0, nil)
+        textLayer.fontSize = 9
+        textLayer.string = text
+        textLayer.alignmentMode = kCAAlignmentCenter
+        return textLayer
+    }
+
     private func calculateAngles() {
         totalRatio = items.map({ $0.ratio }).reduce(0, { $0 + $1 })
         
@@ -165,14 +197,24 @@ public class VMPieChartView: UIView {
     /// calculate center of the graph
     ///
     /// - Returns: point of the center
-    private func calculateCenter() -> CGPoint {
-        return CGPoint(x:bounds.width/2, y: bounds.height/2)
+    private func calculateCenter(of rect: CGRect) -> CGPoint {
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+        return center
     }
     
+    /// calculate diameter of the graph
+    ///
+    /// - Returns: value of the diameter
+    private func calculateDiameter(fitIn rect: CGRect) -> CGFloat {
+        let fitDiameter = min(rect.width, rect.height)
+        return fitDiameter
+    }
+
     /// calculate radius of the graph
     ///
     /// - Returns: value of the radius
-    private func calculateRadius() -> CGFloat {
-        return min(bounds.width, bounds.height)
+    private func calculateRadius(fitIn rect: CGRect) -> CGFloat {
+        let fitRadius = calculateDiameter(fitIn: rect) / 2
+        return fitRadius
     }
 }
